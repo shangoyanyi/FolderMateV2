@@ -1,4 +1,5 @@
-@echo off
+﻿@echo off
+chcp 65001 >nul
 setlocal
 
 REM Get the folder where this script is located
@@ -14,10 +15,17 @@ if not exist "%TARGETDIR%" (
 REM Copy all files to the target directory
 xcopy /E /Y "%BASEDIR%*" "%TARGETDIR%" >nul
 
+
+REM 安裝python依賴套件
+echo [INFO] Installing dependencies...
+:: "%PYEXE%" -m pip install --upgrade pip
+"%PYEXE%" -m pip install -r "%TARGETDIR%\requirements.txt"
+
+
 REM Register right-click context menu items (HKCU = current user)
 for %%S in (todo doing done) do (
     reg add "HKCU\Software\Classes\Directory\shell\FolderMate_%%S" /ve /d "FolderMate: [%%S]" /f
-    reg add "HKCU\Software\Classes\Directory\shell\FolderMate_%%S" /v "Icon" /d "\"%TARGETDIR%\icon.ico\"" /f
+    reg add "HKCU\Software\Classes\Directory\shell\FolderMate_%%S" /v "Icon" /d "\"%TARGETDIR%\icon3.ico\"" /f
     reg add "HKCU\Software\Classes\Directory\shell\FolderMate_%%S\command" /ve /d "\"%PYEXE%\" \"%TARGETDIR%\set_folder_status.py\" %%S \"%%1\"" /f
 )
 
